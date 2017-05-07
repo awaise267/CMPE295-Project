@@ -11,7 +11,7 @@ var chaincodeName = chaincodeId.chaincodeName;
 
 var options = {
     hostname: 'c560f79422f7449b88b373e130ae3b7c-vp0.us.blockchain.ibm.com',
-    port: 5001,
+    port: 5002,
     path: '/chaincode',
     method: 'POST',
     headers: {
@@ -275,6 +275,8 @@ function registercontract(request, response) {
         console.log("Registering the contract for Product Type:" + contractjson.productType);
         console.log("Parameters: " + contractjson);
         var data = constructPutContractJSON('invoke', chaincodeName, 'putcontract', contractjson.contractId, contractjson.productType, JSON.stringify(contractjson), "user_type2_0");
+        console.log("request Data");
+        console.log(data)
         var req = https.request(options, function(res) {
             res.setEncoding('utf8');
             res.on('data', function(body) {
