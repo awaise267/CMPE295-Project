@@ -105,17 +105,24 @@ exports.validate = function(request, response) {
                         res.on('data', function(body) {
                             if (body) {
                                 console.log(body);
-                                body = JSON.parse(body);
-                                if (body.result.status == "OK") {
+                                try{
+                                    body = JSON.parse(body);
+                                    if (body.result.status == "OK") {
 
-                                    setTimeout(paymentProcessing.automatedPaymentProcessing(productid, validateJson.username, validateJson.charge, responseObj.chain_user, responseObj.peer), 6000);
+                                        setTimeout(paymentProcessing.automatedPaymentProcessing(productid, validateJson.username, validateJson.charge, responseObj.chain_user, responseObj.peer), 6000);
 
+                                        response.send({
+                                            "status": "success"
+                                        });
+                                    } else {
+                                        response.send({
+                                            "status": "error"
+                                        });
+                                    }
+                                } catch (err) {
+                                    console.log('error parsing response body');
                                     response.send({
-                                        "status": "success"
-                                    });
-                                } else {
-                                    response.send({
-                                        "status": "error"
+                                        "status": "Error on calling blockchain API"
                                     });
                                 }
                             } else {

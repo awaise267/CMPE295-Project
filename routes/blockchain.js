@@ -236,23 +236,23 @@ exports.queryProduct = function(productId, user, peer, callback) {
                 console.log(chnk);
                 try {
                     chnk = JSON.parse(chnk);
+                    if (chnk.result && chnk.result.status === "OK" && chnk.result.message) {
+                        var product = JSON.parse(chnk.result.message);
+                        callback({
+                            status: "success",
+                            product: product
+                        });
+                    } else {
+                        callback({
+                            status: "error",
+                            err: "Product not found!"
+                        });
+                    }
                 } catch (err) {
                     console.log('error parsing response body');
                     callback({
                         status: "error",
                         err: "Error on calling blockchain API"
-                    });
-                }
-
-                if (chnk.result && chnk.result.status === "OK" && chnk.result.message) {
-                    callback({
-                        status: "success",
-                        product: JSON.parse(chnk.result.message)
-                    });
-                } else {
-                    callback({
-                        status: "error",
-                        err: "Product not found!"
                     });
                 }
             } else {
