@@ -297,6 +297,7 @@ exports.getProductIdsForUser = function(userId, callback) {
                         });
                     } else if (docs.length === 1) {
                         db.close();
+                        console.log(userId);
                         callback({
                             status: 'success',
                             trackedProducts: docs[0].trackedProducts

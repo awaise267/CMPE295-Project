@@ -41,7 +41,11 @@ app.get('/login', function(req, res) {
     res.sendfile(__dirname + '/public/login.html');
 });
 
-app.get('/', sessionsModule.isAuthUser, function(req, res) {
+app.get('/', function(req, res){
+    res.sendfile(__dirname + '/public/demo.html');
+})
+
+app.get('/index', sessionsModule.isAuthUser, function(req, res) {
     res.sendfile(__dirname + '/public/index.html');
 });
 
@@ -55,7 +59,9 @@ app.post('/events', contract.validate);
 app.get('/track/:qrCode', product.query);
 app.get('/user-products-list', user.getProductIdsForUser);
 
-app.post('/paymentprocessing/register',paymentProcessing.register)
+app.post('/paymentprocessing/register',paymentProcessing.register);
+
+app.get('/payment-history/:productId', paymentProcessing.getPaymentHistory);
 
 app.get('/logout', function(req, res) {
     req.session.reset();

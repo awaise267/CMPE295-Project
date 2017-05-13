@@ -1,18 +1,19 @@
 <div class="row">
     <div class="col-lg-4 col-lg-offset-4">
-        <div ng-show="userProducts.length!=0">
+        <div class="table-responsive" ng-show="userProducts.length!=0">
             <h2 style="text-align:center">Product History</h2>
             <table style="box-shadow: 10px 10px 15px #888888;" st-table="displayedCollection" st-safe-src="userProducts"
                    class="table table-striped">
                 <thead>
                 <tr>
-                    <th colspan="5"><input st-search="" class="form-control" placeholder="Search..." type="text"/></th>
+                    <th colspan="6"><input st-search="" class="form-control" placeholder="Search..." type="text"/></th>
                 </tr>
                 <tr>
                     <th st-sort="qrCode">Id</th>
                     <th st-sort="productName">Name</th>
                     <th st-sort="description">Description</th>
                     <th st-sort="category">Category</th>
+                    <th>Payments</th>
                 </tr>
 
                 </thead>
@@ -22,6 +23,7 @@
                     <td>{{row.productName}}</td>
                     <td>{{row.description}}</td>
                     <td>{{row.category}}</td>
+                    <td>{{row.transaction.paidTo}}&nbsp;{{row.transaction.amount}} </td>
                     <td>
                         <button type="button" ng-click="trackProduct(row)" class="btn btn-sm btn-danger">
                             <b>Track Product</b>
@@ -33,7 +35,13 @@
 
         </div>
 
-        <div ng-hide="userProducts.length!=0" style="margin-top:35px;">
+        <div ng-hide="userProductsPresent">
+            <div style="margin:30px auto; text-align:center; color:red;">
+                <h3>No asset history found for the logged in user!</h3>
+            </div>
+        </div>
+
+        <div ng-hide="userProducts.length!=0 || hideSpinner" style="margin-top:35px;">
 
                 <md-content style="min-height:250px; background:none; overflow: hidden;">
                     <div style="width:200px; height:200px; position: relative; margin:0 auto;">

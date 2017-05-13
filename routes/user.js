@@ -71,6 +71,7 @@ exports.login = function(req, res) {
 
 exports.getProductIdsForUser = function(req, res) {
     mongo.getProductIdsForUser(req.session.user, function(result) {
+        console.log(result);
         if (result.status === 'success') {
             res.send({
                 status: 'success',

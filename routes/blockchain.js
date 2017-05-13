@@ -233,7 +233,6 @@ exports.queryProduct = function(productId, user, peer, callback) {
         res.on('end', function() {
 
             if (chnk) {
-                console.log(chnk);
                 try {
                     chnk = JSON.parse(chnk);
                     if (chnk.result && chnk.result.status === "OK" && chnk.result.message) {
