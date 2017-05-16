@@ -323,15 +323,33 @@ func validateEvent(contractInfo string, eventInfo string, eventInfoStruct EventI
 
 		if eventParams[k] == nil || eventParams[k] != contractParams[k] {
 
-			fmt.Println("(" + k + "," + eventParams[k].(string) + ") is absent or different from what is expected in smart contract")
-			return false, nil, state
-		}
+			if eventParams[k] != nil { //FAIL THE TEST
+				fmt.Println("(" + k + "," + eventParams[k].(string) + ") is different from what is expected in smart contract")
+				test = Test{
+					Objective:      k,
+					ExpectedResult: contractParams[k].(string),
+					ActualResult:   eventParams[k].(string),
+					Status:         "NOT VERIFIED",
+				}
+			} else {
+				fmt.Println("(" + k + ") is absent from event params")
 
-		test = Test{
-			Objective:      k,
-			ExpectedResult: contractParams[k].(string),
-			ActualResult:   eventParams[k].(string),
-			Status:         "VERIFIED",
+				test = Test{
+					Objective:      k,
+					ExpectedResult: contractParams[k].(string),
+					ActualResult:   "nil",
+					Status:         "NOT VERIFIED",
+				}
+			}
+
+		} else { // PASS THE TEST
+
+			test = Test{
+				Objective:      k,
+				ExpectedResult: contractParams[k].(string),
+				ActualResult:   eventParams[k].(string),
+				Status:         "VERIFIED",
+			}
 		}
 		tests = append(tests, test)
 	}
@@ -343,6 +361,8 @@ func validateEvent(contractInfo string, eventInfo string, eventInfoStruct EventI
 		Address: eventInfoStruct.Username,
 		Tests:   tests,
 	}
+
+
 
 	return true, tests, state
 }
@@ -410,41 +430,36 @@ func (t *SimpleChaincode) validate(stub shim.ChaincodeStubInterface, args []stri
 
 	fmt.Printf("Event Info Struct is %+v\n", eventInfoStruct)
 
-	ret, _, state := validateEvent(eventInfo, contractInfo, eventInfoStruct)
+	_, _, state := validateEvent(contractInfo, eventInfo, eventInfoStruct)
 
-	if ret == true {
+	fmt.Println("JSON parsed into following struct \n")
 
-		//fmt.Println("First element of interface array is " + vProductInfo["states"].([]interface{})[0].(string))
-		fmt.Println("JSON parsed into following struct \n")
+	fmt.Printf("%+v\n", productSchema)
 
-		fmt.Printf("%+v\n", productSchema)
+	productSchema.States = append(productSchema.States, state)
 
-		productSchema.States = append(productSchema.States, state)
+	fmt.Println("JSON modified into following struct \n")
 
-		fmt.Println("JSON modified into following struct \n")
+	fmt.Printf("%+v\n", productSchema)
 
-		fmt.Printf("%+v\n", productSchema)
-
-		productSchemaJSON, err := json.Marshal(productSchema)
-		if err != nil {
-			fmt.Println(err)
-			return nil, errors.New("Error")
-		}
-
-		err = stub.PutState(productId, []byte(string(productSchemaJSON[:]))) //write the variable into the chaincode state
-		if err != nil {
-			return nil, err
-		}
-		validateResponse.status = "success"
-
-		validateResponseAsBytes, _ := json.Marshal(validateResponse) //convert to array of bytes
-
-		return validateResponseAsBytes, nil
+	productSchemaJSON, err := json.Marshal(productSchema)
+	if err != nil {
+		fmt.Println(err)
+		return nil, errors.New("Error")
 	}
-	validateResponse.status = "failure"
+
+	err = stub.PutState(productId, []byte(string(productSchemaJSON[:]))) //write the variable into the chaincode state
+	if err != nil {
+		return nil, err
+	}
+
+	//fmt.Println("First element of interface array is " + vProductInfo["states"].([]interface{})[0].(string))
+
+	validateResponse.status = "success"
 
 	validateResponseAsBytes, _ := json.Marshal(validateResponse) //convert to array of bytes
-	return nil, errors.New(string(validateResponseAsBytes[:]))
+
+	return validateResponseAsBytes, nil
 
 	// if err != nil {
 	// 	jsonResp = "{\"Error\":\"Failed to get state for " + key + "\"}"
